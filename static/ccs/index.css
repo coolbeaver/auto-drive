@@ -1,0 +1,58 @@
+.was-validated{
+    max-width:600px;
+}
+
+.container-xxl{
+    padding: 0;
+}
+
+@media (max-width: 500px) {
+  .zxc{
+    display: none;
+  }
+  .backi{
+    max-width:134px !important;
+  }
+  .card-text{
+    width:370px;
+  }
+}
+
+.formes {
+    display: flex;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.formbody{
+    margin-left:auto;
+    margin-right:auto;
+}
+
+a {
+    text-decoration: None;
+
+}
+
+.item-medium__category {
+    color: Grey;
+}
+
+.l-base__col__33p {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 50px;
+    width: 240px;
+}
+
+.item-medium__image {
+    width: 240px;
+}
+
+.item-medium__link {
+    max-width: 240px;
+    font-size: 20px;
+}
+

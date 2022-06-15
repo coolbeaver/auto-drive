@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="static/ccs/calc.css">
+    <title>Расчёты</title>
+</head>
+<body>
+    <div class="b-example-divider"></div>
+
+  <header class="p-3 mb-3 border-bottom">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
+          <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"/></svg>
+        </a>
+
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+          {% if logged_in == True  %}
+            <li><a href="{{ url_for('index', id=id) }}" class="nav-link px-2 link-dark">Мой блог</a></li>
+          {% endif %}
+          <li><a href="{{ url_for('news') }}" class="nav-link px-2 link-dark">Новости</a></li>
+          <li><a href="{{ url_for('calculations') }}" class="nav-link px-2 link-secondary">Расчёты</a></li>
+          <li><a href="{{ url_for('users') }}" class="nav-link px-2 link-dark">Пользователи</a></li>
+
+        </ul>
+
+
+
+        <div class="dropdown text-end">
+
+          {% if logged_in == False  %}
+             <a class="dropdown-item" href="{{ url_for('login') }}">Войти</a>
+            {% endif %}
+
+
+
+            {% if logged_in == True  %}
+          <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="{{ picture }}" alt="mdo" width="32" height="32" class="rounded-circle">
+          </a>
+          <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
+            <li><a class="dropdown-item" href="{{ url_for('profile') }}">Профиль</a></li>
+            <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="{{ url_for('logout') }}">Выйти</a></li>
+            {% endif %}
+
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+
+    <div class="calc">
+      <h1 class="display-6">Траты автовладельца</h1>
+
+      {% if credit != 0 %}
+      <figure class="text-center">
+      <blockquote class="blockquote">
+        <p>{{ credit }} рублей в месяц</p>
+      </blockquote>
+      <figcaption class="blockquote-footer">
+        {{ credit*12 }} рублей выплата по кредиту за год.
+      </figcaption>
+    </figure>
+    {% endif %}
+      {% if checked != False %}
+            <figure class="text-center">
+      <blockquote class="blockquote">
+        <p>{{ oil }} рублей в месяц</p>
+      </blockquote>
+      <figcaption class="blockquote-footer">
+        {{ oil*12 }} рублей на оплату бензина за год.
+      </figcaption>
+        <figure class="text-center">
+      <blockquote class="blockquote">
+        <p>600 рублей в месяц</p>
+      </blockquote>
+      <figcaption class="blockquote-footer">
+        7200 рублей на оплату мойки за год.
+      </figcaption>
+    </figure>
+      <figure class="text-center">
+      <blockquote class="blockquote">
+        <p>{{ strah }} рублей в год</p>
+      </blockquote>
+      <figcaption class="blockquote-footer">
+         За страхование Т/С
+      </figcaption>
+    </figure>
+
+    </figure>
+      <figure class="text-center">
+      <blockquote class="blockquote">
+        <p>{{ nalog }} рублей в год</p>
+      </blockquote>
+      <figcaption class="blockquote-footer">
+         Налог на Т/С
+      </figcaption>
+    </figure>
+
+    </figure>
+      <figure class="text-center">
+      <blockquote class="blockquote">
+        <p>2500 рублей два раза в год</p>
+      </blockquote>
+      <figcaption class="blockquote-footer">
+         5000 рублей на оплату сезонной смены шин за год.
+      </figcaption>
+    </figure>
+      <h3 class="text-center">
+        {{ itog }} рублей
+  <small class="text-muted">- ежегодные затраты на ваше Т/С</small>
+</h3>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('calculations') }}" class="row g-3">
+  <div class="col-md-6">
+    <label for="inputEmail4" class="form-label">Количество Л/С</label>
+    <input type="number" class="form-control" id="inputEmail4" name="ls" placeholder="150" required>
+  </div>
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Стоимость автомобиля</label>
+    <input type="number" class="form-control" id="inputPassword4"  name="price_ts" placeholder="3450000" required>
+  </div>
+  <div class="col-6">
+    <label for="inputAddress" class="form-label">Cумма займа в кредит</label>
+    <input type="number" class="form-control" id="inputAddress" name="credit" placeholder="Если покупаете ТС без займа укажите 0" required>
+  </div>
+  <div class="col-3">
+    <label for="inputAddress" class="form-label">Срок займа</label>
+    <input type="number" class="form-control" id="inputAddress" name="time_credit" placeholder="3">
+  </div>
+  <div class="col-3">
+    <label for="inputAddress" class="form-label">Процент</label>
+    <input type="number" class="form-control" id="inputAddress" name="percent_credit" placeholder="11">
+  </div>
+  <div class="col-md-6">
+    <label for="inputEmail4" class="form-label">Средний расход Вашего ТС на 100 КМ</label>
+    <input type="number" class="form-control" id="inputEmail4" name="avg_cons" placeholder="9" required>
+  </div>
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Стоимость литра бензина</label>
+    <input type="number" class="form-control" id="inputPassword4" name="price_benz" placeholder="50" required>
+  </div>
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Регулярные поездки в КМ</label>
+    <input type="number" class="form-control" id="inputPassword4" name="reg_go" placeholder="30" required>
+  </div>
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Количество регулярные поездок в месяц</label>
+    <input type="number" class="form-control" id="inputPassword4" name="col_reg" placeholder="15" required>
+  </div>
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Нерегулярные поездки в КМ</label>
+    <input type="number" class="form-control" id="inputPassword4" name="noreg_go" placeholder="150" required>
+  </div>
+  <div class="col-md-6">
+    <label for="inputPassword4" class="form-label">Количество нерегулярных поездок в месяц</label>
+    <input type="number" class="form-control" id="inputPassword4" name="col_noreg" placeholder="3" required>
+  </div>
+  <label for="inputPassword4" class="form-label">Вид страхования</label>
+  <div class="col-12">
+  <input class="form-check-input" type="radio" name="strah" value="osago" id="osago" checked>
+  <label class="form-check-label" for="osago">
+    ОСАГО
+  </label>
+</div>
+<div class="col-12">
+  <input class="form-check-input" type="radio" name="strah" value="casko" id="casko">
+  <label class="form-check-label" for="casko">
+    КАСКО
+  </label>
+</div>
+  <label for="inputPassword4" class="form-label">Дополнительные расходы</label>
+  <div class="col-12">
+  <input class="form-check-input" type="checkbox" name="dop_1" value="clean" id="2" checked disabled>
+  <label class="form-check-label" for="2">
+    Мойка кузова два раза в месяц
+  </label>
+  </div>
+  <div class="col-12">
+  <input class="form-check-input" type="checkbox" name="dop_2" value="rules" id="1" checked disabled>
+  <label class="form-check-label" for="1">
+    Сезонная смена шин два раза в год
+  </label>
+  </div>
+
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Рассчитать</button>
+  </div>
+</form>
+  </div>
+
+</body>
+</html>

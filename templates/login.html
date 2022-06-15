@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.88.1">
+    <title>Вход</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.1/examples/sign-in/">
+
+
+
+    <!-- Bootstrap core CSS -->
+<link href="/static/boot/assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+
+    <!-- Custom styles for this template -->
+    <link href="/static/boot/sign-in/signin.css" rel="stylesheet">
+  </head>
+  <body class="text-center">
+
+<main class="form-signin">
+  <form method="POST" action="{{ url_for('login') }}">
+    <div class="form-floating">
+      <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="mail">
+      <label for="floatingInput">Почта</label>
+    </div>
+    <div class="form-floating">
+      <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
+      <label for="floatingPassword">Пароль</label>
+    </div>
+    {% if "improperly" in result %}
+      <p>Введен неверный логин или пароль.</p>
+    {% endif %}
+    {% if "block" in result %}
+      <p>Ваш аккаунт был заблокирован администрацией.</p>
+    {% endif %}
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Войти</button>
+    <p></p>
+    <a class="link-primary" href="{{ url_for('registration') }} ">Регистрация</a>
+    <p class="mt-3 mb-2 text-muted">&copy; 2022</p>
+  </form>
+</main>
+
+
+
+  </body>
+</html>

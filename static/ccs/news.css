@@ -1,0 +1,30 @@
+
+.formbody{
+    margin-left:auto;
+    margin-right:auto;
+}
+
+a {
+    text-decoration: None;
+
+}
+
+.item-medium__category {
+    color: Grey;
+}
+
+.l-base__col__33p {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    width: 340px;
+}
+
+.item-medium__image {
+    width: 340px;
+}
+
+.item-medium__link {
+    max-width: 240px;
+    font-size: 20px;
+}
