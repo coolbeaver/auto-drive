@@ -6,6 +6,7 @@ import os
 import datetime
 from random import getrandbits, randint
 from werkzeug.utils import secure_filename
+from functools import wraps
 
 from config import user_db
 from defs.sct_key import s_key
@@ -24,44 +25,43 @@ con = sqlite3.connect(user_db, check_same_thread=False)
 cur = con.cursor()
 
 
+def only_auth(func):
+    @wraps(func)
+    def wrapper():
+        try:
+            return func(logged_in=session['logged_in'], id=session['id'], picture=session['picture'],
+                        token=session['token'])
+        except KeyError:
+            return func(logged_in=False, id=None, picture=None, token=None)
+
+    return wrapper
+
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/news', methods=['GET', 'POST'])
-def news():
+@only_auth
+def news(**kwargs):
     news_list = pars_news()
-    try:
-        logged_in = session['logged_in']
-        id = session['id']
-        picture = session['picture']
-        return render_template('news.html', id=id, logged_in=logged_in, news=news_list, picture=picture)
-    except KeyError:
-        return render_template('news.html', id=None, logged_in=False, news=news_list)
+    return render_template('news.html', id=kwargs["id"], logged_in=kwargs["logged_in"], news=news_list,
+                           picture=kwargs["picture"])
 
 
 @app.route('/admin', methods=['GET', 'POST'])
-def admin():
-    try:
-        logged_in = session['logged_in']
-        id = session['id']
-        picture = session['picture']
-        token = session['token']
-        if token == '44a8c14151b3cad58278fb2b706831f7853f971d847979b6dfb3119721c9401d':
-            return render_template('admin.html', id=id, logged_in=logged_in, picture=picture)
-        else:
-            abort(401)
-    except KeyError:
+@only_auth
+def admin(**kwargs):
+    print(kwargs)
+    if kwargs["token"] == '44a8c14151b3cad58278fb2b706831f7853f971d847979b6dfb3119721c9401d':
+        return render_template('admin.html', id=kwargs["id"], logged_in=kwargs["logged_in"], picture=kwargs["picture"])
+    else:
         abort(401)
 
 
 @app.route('/users', methods=['GET', 'POST'])
-def users():
+@only_auth
+def users(**kwargs):
     allUsers = select_all_users(cur)
-    try:
-        logged_in = session['logged_in']
-        id = session['id']
-        picture = session['picture']
-        return render_template('users.html', id=id, logged_in=logged_in, picture=picture, allUsers=allUsers)
-    except KeyError:
-        return render_template('users.html', logged_in=False, allUsers=allUsers)
+    return render_template('users.html', id=kwargs["id"], logged_in=kwargs["logged_in"], picture=kwargs["picture"],
+                           allUsers=allUsers)
 
 
 @app.route('/user/<int:id>/', methods=['GET', 'POST'])
@@ -165,16 +165,8 @@ def registration():
 
 
 @app.route('/calculations', methods=['GET', 'POST'])
-def calculations():
-    try:
-        print(session)
-        logged_in = session['logged_in']
-        picture = session['picture']
-        id = session['id']
-    except KeyError:
-        logged_in = False
-        id = None
-        picture = None
+@only_auth
+def calculations(**kwargs):
     credit_result = 0
     checked = False
     if request.method == 'POST':
@@ -207,9 +199,9 @@ def calculations():
         print(itog)
         create_result(cur, con, data)
         return render_template('calculations.html', credit=credit_result, strah=strah_result, oil=oil_result,
-                               nalog=nalog_result, itog=itog, checked=checked, picture=picture)
-    return render_template('calculations.html', credit=credit_result, checked=checked, logged_in=logged_in,
-                           id=id, picture=picture)
+                               nalog=nalog_result, itog=itog, checked=checked, picture=kwargs['picture'])
+    return render_template('calculations.html', credit=credit_result, checked=checked, logged_in=kwargs['logged_in'],
+                           id=kwargs['id'], picture=kwargs['picture'])
 
 
 @app.route('/admin/<action>/', methods=['GET', 'POST'])
@@ -252,11 +244,9 @@ def admin_menu(action):
 
 
 @app.route('/profile', methods=['GET', 'POST'])
-def profile():
-    try:
-        logged_in = session['logged_in']
-        id = session['id']
-        picture = session['picture']
+@only_auth
+def profile(**kwargs):
+    if kwargs['logged_in'] is True:
         if request.method == 'POST':
             file = request.files['file']
             username_change = request.form['text_post']
@@ -264,18 +254,19 @@ def profile():
             car = request.form['text_car']
             if str(file.filename):
                 filename = save_image(file, app, secure_filename, os, randint, 'static/images/userspic/')
-                update_user(cur, con, 'picture', filename, id)
-                session['picture'] = filename
+                update_user(cur, con, 'picture', filename, kwargs['id'])
+                kwargs['picture'] = filename
             if username_change:
-                update_user(cur, con, 'username', username_change, id)
+                update_user(cur, con, 'username', username_change, kwargs['id'])
             if about:
-                update_user(cur, con, 'about', about, id)
+                update_user(cur, con, 'about', about, kwargs['id'])
             if car:
-                update_user(cur, con, 'car', car, id)
-            return redirect(url_for('profile', id=id))
+                update_user(cur, con, 'car', car, kwargs['id'])
+            return redirect(url_for('profile', id=kwargs['id']))
         else:
-            return render_template('profile.html', id=id, logged_in=logged_in, picture=picture)
-    except KeyError:
+            return render_template('profile.html', id=kwargs['id'], logged_in=kwargs['logged_in'],
+                                   picture=kwargs['picture'])
+    else:
         return redirect(url_for('login'))
 
 
