@@ -40,15 +40,15 @@
 <main class="form-signin">
   <form method="POST" action="{{ url_for('registration') }}">
     <div class="form-floating">
-      <input type="text" class="form-control" id="floatingInput" placeholder="Имя пользователя" name="username">
+      <input type="text" class="form-control" id="floatingInput" minlength="3" placeholder="Имя пользователя" name="username" required>
       <label for="floatingInput">Имя</label>
     </div>
     <div class="form-floating">
-      <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="mail">
+      <input type="email" class="form-control" id="floatingInput" minlength="5" placeholder="name@example.com" name="mail" required>
       <label for="floatingInput">Почта</label>
     </div>
     <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
+      <input type="password" class="form-control" minlength="5" id="floatingPassword" placeholder="Password" name="password" required>
       <label for="floatingPassword">Пароль</label>
     </div>
     {% if "rep_name" in result %}

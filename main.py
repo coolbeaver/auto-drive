@@ -8,7 +8,7 @@ from random import getrandbits, randint
 from werkzeug.utils import secure_filename
 from functools import wraps
 
-from config import user_db
+from config import user_db, path_pic
 from defs.sct_key import s_key
 from defs.database import *
 from defs.calculate import *
@@ -29,6 +29,7 @@ def only_auth(func):
     @wraps(func)
     def wrapper():
         try:
+            session.modified = True
             return func(logged_in=session['logged_in'], id=session['id'], picture=session['picture'],
                         token=session['token'])
         except KeyError:
@@ -79,7 +80,7 @@ def index(id):
             if request.method == 'POST':
                 text = request.form['text_post']
                 file = request.files['file']
-                filename = save_image(file, app, secure_filename, os, randint, 'static/images/userspic/')
+                filename = save_image(file, app, secure_filename, os, randint, path_pic)
                 current_date = datetime.datetime.now()
                 current_date_string = current_date.strftime('%m/%d/%y %H:%M:%S')
                 data = (idUser, current_date_string, text, filename,)
@@ -169,6 +170,8 @@ def registration():
 def calculations(**kwargs):
     credit_result = 0
     checked = False
+    dop_1_price = 0
+    dop_2_price = 0
     if request.method == 'POST':
         checked = True
         ls = int(request.form['ls'])
@@ -181,8 +184,18 @@ def calculations(**kwargs):
         reg_go = int(request.form['reg_go'])
         col_reg = int(request.form['col_reg'])
         noreg_go = int(request.form['noreg_go'])
+        stag = int(request.form['stag'])
+        age = int(request.form['age'])
         col_noreg = int(request.form['col_noreg'])
         strah = request.form['strah']
+        dtp = float(request.form['dtp'])
+        dop_0 = request.form['dop_0']
+        dop_1 = request.form['dop_1']
+        dop_2 = request.form['dop_2']
+        print(dop_0)
+        print(dop_1)
+        print(dop_2)
+        price_ts_first_years = (price_ts / 100) * 10
         current_date = datetime.datetime.now()
         current_date_string = current_date.strftime('%m/%d/%y %H:%M:%S')
         data = (ls, current_date_string, price_ts, credit, time_credit, percent_credit, avg_cons,
@@ -190,16 +203,24 @@ def calculations(**kwargs):
         if credit != 0:
             credit_result = calc_credit(credit, int(percent_credit), int(time_credit))
         if strah == 'osago':
-            strah_result = calc_osago(ls)
+            strah_result = calc_osago(ls, dtp, stag, age)
         elif strah == 'casko':
             strah_result = 71000
+        if dop_1 == 'True':
+            dop_1_price = 7200
+        if dop_2 == 'True':
+            dop_2_price = 5000
         oil_result = calc_oil(avg_cons, price_benz, reg_go, col_reg, noreg_go, col_noreg)
         nalog_result = calc_nalog(ls)
-        itog = (12 * credit_result) + strah_result + (12 * oil_result) + nalog_result + 5000 + 7200
+        itog = (12 * credit_result) + strah_result + (12 * oil_result) + nalog_result + dop_2_price + dop_1_price
         print(itog)
         create_result(cur, con, data)
         return render_template('calculations.html', credit=credit_result, strah=strah_result, oil=oil_result,
-                               nalog=nalog_result, itog=itog, checked=checked, picture=kwargs['picture'])
+                               nalog=nalog_result, itog=itog, checked=checked, picture=kwargs['picture'], dop_0=dop_0,
+                               dop_1=dop_1, dop_2=dop_2, logged_in=kwargs['logged_in'],
+                                price_ts_first_years=int(price_ts_first_years),
+                           id=kwargs['id'])
+
     return render_template('calculations.html', credit=credit_result, checked=checked, logged_in=kwargs['logged_in'],
                            id=kwargs['id'], picture=kwargs['picture'])
 
@@ -253,9 +274,9 @@ def profile(**kwargs):
             about = request.form['text_about']
             car = request.form['text_car']
             if str(file.filename):
-                filename = save_image(file, app, secure_filename, os, randint, 'static/images/userspic/')
+                filename = save_image(file, app, secure_filename, os, randint, path_pic)
                 update_user(cur, con, 'picture', filename, kwargs['id'])
-                kwargs['picture'] = filename
+                session['picture'] = filename
             if username_change:
                 update_user(cur, con, 'username', username_change, kwargs['id'])
             if about:

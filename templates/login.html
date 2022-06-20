@@ -40,11 +40,11 @@
 <main class="form-signin">
   <form method="POST" action="{{ url_for('login') }}">
     <div class="form-floating">
-      <input type="text" class="form-control" id="floatingInput" placeholder="name@example.com" name="mail">
+      <input type="email" class="form-control" minlength="5" id="floatingInput" placeholder="name@example.com" name="mail" required>
       <label for="floatingInput">Почта</label>
     </div>
     <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
+      <input type="password" class="form-control" minlength="5" id="floatingPassword" placeholder="Password" name="password" required>
       <label for="floatingPassword">Пароль</label>
     </div>
     {% if "improperly" in result %}
